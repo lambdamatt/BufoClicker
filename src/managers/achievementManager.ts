@@ -392,9 +392,11 @@ public reapplyAllAchievementRewards(): void {
   // Get all unlocked achievements
   const unlockedAchievements = this.getUnlockedAchievements();
   
-  // Reapply each achievement's reward
+  // Reapply each achievement's reward. BufoBonus is a one-time payout that
+  // is already in the saved bufo count - re-paying it here handed it out
+  // again on every page load and every transcend (reload = free bufos).
   for (const achievement of unlockedAchievements) {
-    if (achievement.reward) {
+    if (achievement.reward && achievement.reward.type !== RewardType.BufoBonus) {
       this.applyAchievementReward(achievement);
     }
   }

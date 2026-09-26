@@ -138,7 +138,10 @@ to the repo to avoid creating the problem in the first place.
   `AchievementManager` re-applies on `PRESTIGE_TRANSCENDED`. Invariant worth
   testing after touching any of this: clickMultiplier with no reload ==
   after one reload == after two reloads == (click upgrades x clickBoost
-  rewards).
+  rewards). `reapplyAllAchievementRewards()` deliberately skips `BufoBonus`:
+  it's a one-time payout already sitting in the saved bufo count, and
+  re-paying it made every reload and every transcend hand it out again
+  (~101M free bufos a time once `upgrade_75` is unlocked).
 - **A full-screen fight overlay needs `pointer-events: auto` on itself, not
   just its children.** `.boss-fight-overlay` used to be `pointer-events: none`
   with only the sprite/HUD set to `auto` - visually it covered the screen but
