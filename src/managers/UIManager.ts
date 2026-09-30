@@ -12,6 +12,7 @@ import { UpgradeList } from '../ui/components/upgradeList';
 import { ProductionStats } from '../ui/components/productionStats';
 import { GoldenBufo } from '../ui/components/goldenBufo';
 import { BossFight } from '../ui/components/bossFight';
+import { GodMode } from '../ui/components/godMode';
 import { GAME_TICK, PRESTIGE_TRANSCENDED } from '../core/eventTypes';
 import { saveGame } from '../game/gameSave';
 import { getSaveManager } from '../utils/saveManager';
@@ -278,6 +279,7 @@ private createAchievementNotificationContainer(): void {
     const productionStats = new ProductionStats(); // New component
     const goldenBufo = new GoldenBufo(); // Roaming Golden Bufo + reward toast
     const bossFight = new BossFight(); // Clicker Boss banner + fight overlay
+    const godMode = new GodMode(); // Cheat panel (bottom-left)
 
     // Initialize all components
     resourceDisplay.init();
@@ -288,6 +290,7 @@ private createAchievementNotificationContainer(): void {
     productionStats.init();
     goldenBufo.init();
     bossFight.init();
+    godMode.init();
 
     const gameCore = getGameCore();
     gameCore.checkUnlocks();

@@ -1,0 +1,64 @@
+/* ---- God mode cheat panel (bottom-left) ---- */
+
+.god-mode {
+  position: fixed;
+  left: var(--spacing-md);
+  bottom: var(--spacing-md);
+  z-index: 900; /* above the columns, below modals / boss overlay / golden bufo */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  max-width: calc(100vw - 2 * var(--spacing-md));
+}
+
+.god-mode__toggle,
+.god-mode__action {
+  min-height: 44px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.god-mode__toggle {
+  background: var(--color-accent);
+  color: var(--color-text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.god-mode__panel {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-sm);
+  width: 320px;
+  max-width: 100%;
+  padding: var(--spacing-md);
+  background: var(--color-surface);
+  border: 2px solid var(--color-accent);
+  border-radius: var(--border-radius-lg);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.god-mode__panel[hidden] {
+  display: none;
+}
+
+.god-mode__readout {
+  grid-column: 1 / -1;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-light);
+}
+
+.god-mode__action {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.god-mode__action:active {
+  background: var(--color-primary-dark);
+}
