@@ -40,6 +40,41 @@ export function roundTo(value: number, decimals: number = 2): number {
   }
   
 /**
+ * Short-scale magnitude names, one per power of 1,000 (index 0 = < 1,000).
+ * Shared by formatNumber, formatNumberWithPrecision and getNumberFullName so
+ * the three can't drift apart.
+ */
+const MAGNITUDES: ReadonlyArray<readonly [short: string, full: string]> = [
+  ["", ""],
+  ["K", "Thousand"],
+  ["M", "Million"],
+  ["B", "Billion"],
+  ["T", "Trillion"],
+  ["Qa", "Quadrillion"],
+  ["Qi", "Quintillion"],
+  ["Sx", "Sextillion"],
+  ["Sp", "Septillion"],
+  ["Oc", "Octillion"],
+  ["No", "Nonillion"],
+  ["Dc", "Decillion"],
+  ["Ud", "Undecillion"],
+  ["Dd", "Duodecillion"],
+  ["Td", "Tredecillion"],
+  ["Qad", "Quattuordecillion"],
+  ["Qid", "Quindecillion"],
+  ["Sxd", "Sexdecillion"],
+  ["Spd", "Septendecillion"],
+  ["Ocd", "Octodecillion"],
+  ["Nod", "Novemdecillion"],
+  ["Vg", "Vigintillion"],
+];
+
+/** Index into MAGNITUDES for a value, capped at the largest named magnitude. */
+function magnitudeIndex(absValue: number): number {
+  return Math.min(Math.floor(Math.log10(absValue) / 3), MAGNITUDES.length - 1);
+}
+
+/**
  * Formats a number with shortened suffixes (K, M, B, T, etc.)
  * @param value - The number to format
  * @param decimals - Number of decimal places (defaults to 1)
@@ -63,16 +98,16 @@ export function formatNumber(value: number, decimals: number = 1): string {
     return Math.round(value).toLocaleString('en-US');
   }
 
-  const suffixes = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"];
-  const exponent = Math.min(Math.floor(Math.log10(absValue) / 3), suffixes.length - 1);
+  const exponent = magnitudeIndex(absValue);
+  const suffix = MAGNITUDES[exponent][0];
   const scaled = value / Math.pow(10, exponent * 3);
-  // Once we're past the largest named suffix (Decillion), `scaled` itself can
+  // Once we're past the largest named suffix (Vigintillion), `scaled` itself can
   // still be astronomically large (unbounded exponential costs at very high
   // owned counts). Cap it so we never fall back to JS's scientific notation
   // (".toLocaleString"/template coercion switches to it past ~1e21).
   const displayScaled = Math.min(scaled, 999_999);
 
-  return `${displayScaled.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${suffixes[exponent]}${scaled > displayScaled ? '+' : ''}`;
+  return `${displayScaled.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${suffix}${scaled > displayScaled ? '+' : ''}`;
 }
 
 /**
@@ -99,14 +134,14 @@ export function formatNumberWithPrecision(value: number): string {
     return Math.round(value).toLocaleString('en-US');
   }
 
-  const suffixes = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"];
-  const exponent = Math.min(Math.floor(Math.log10(absValue) / 3), suffixes.length - 1);
+  const exponent = magnitudeIndex(absValue);
+  const suffix = MAGNITUDES[exponent][0];
   const scaled = value / Math.pow(10, exponent * 3);
   // See formatNumber() - clamp so absurd magnitudes never render as "1e+271".
   const displayScaled = Math.min(scaled, 999_999);
 
   // 3 decimal places, and DO include the magnitude suffix (e.g. "1.234T").
-  return `${displayScaled.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 })}${suffixes[exponent]}${scaled > displayScaled ? '+' : ''}`;
+  return `${displayScaled.toLocaleString('en-US', { minimumFractionDigits: 3, maximumFractionDigits: 3 })}${suffix}${scaled > displayScaled ? '+' : ''}`;
 }
 /**
  * Returns the full word for a number suffix
@@ -123,24 +158,7 @@ export function getNumberFullName(value: number): string {
     return "";
   }
   
-  const fullNames = [
-    "", 
-    "Thousand", 
-    "Million", 
-    "Billion", 
-    "Trillion", 
-    "Quadrillion", 
-    "Quintillion", 
-    "Sextillion", 
-    "Septillion", 
-    "Octillion", 
-    "Nonillion", 
-    "Decillion"
-  ];
-  
-  const exponent = Math.min(Math.floor(Math.log10(absValue) / 3), fullNames.length - 1);
-  
-  return fullNames[exponent];
+  return MAGNITUDES[magnitudeIndex(absValue)][1];
 }
   /**
    * Formats a duration in seconds to a human-readable string
